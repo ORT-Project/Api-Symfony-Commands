@@ -31,7 +31,8 @@ class Command
     private ?string $description = null;
 
     #[Groups(["getCommands"])]
-    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'command')]
+    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'command', cascade: ['persist', 'remove']
+        , orphanRemoval: true)]
     private Collection $Users;
 
     public function __construct()

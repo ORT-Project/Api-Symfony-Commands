@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\EventSubscriber\ExceptionSubscriber;
 use App\Repository\CommandRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -42,14 +43,15 @@ class UserController extends AbstractController
         $em->flush();
 
         $jsonUser = $serializer->serialize($user, 'json', ['groups' => 'getUsers']);
-        $location = $urlGenerator->generate('app_user_id', ['id' => $user->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $location = $urlGenerator->generate('app_user_id', ['id' => $user->getId()]
+            , UrlGeneratorInterface::ABSOLUTE_URL);
 
         return new JsonResponse($jsonUser, Response::HTTP_CREATED, ['location' => $location], true);
     }
 
     #[Route('/update/{id}', name:'app_update_user', methods:['PUT'])]
-    public function updateBook(Request $request, SerializerInterface $serializer, User $currentUser, EntityManagerInterface $em,
-                               CommandRepository $commandRepository): JsonResponse
+    public function updateBook(Request $request, SerializerInterface $serializer
+        , User $currentUser, EntityManagerInterface $em, CommandRepository $commandRepository): JsonResponse
     {
         $updateUser = $serializer->deserialize($request->getContent(),
             User::class,
@@ -74,14 +76,10 @@ class UserController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_user_id',  requirements: ['id' => '\d+'], methods: ['GET'])]
-    public function getUserDetail(int $id, SerializerInterface $serializer, UserRepository $userRepository): JsonResponse
+    public function getUserDetail(User $user, SerializerInterface $serializer
+        , UserRepository $userRepository): JsonResponse
     {
-
-        $user = $userRepository->find($id);
-        if ($user) {
-            $jsonUser = $serializer->serialize($user, 'json', ['groups' => 'getUsers']);
-            return new JsonResponse($jsonUser, Response::HTTP_OK, [], true);
-        }
-        return new JsonResponse(null, Response::HTTP_NOT_FOUND);
+        $jsonUser = $serializer->serialize($user, 'json', ['groups' => 'getUsers']);
+        return new JsonResponse($jsonUser, Response::HTTP_OK, [], true);
     }
 }

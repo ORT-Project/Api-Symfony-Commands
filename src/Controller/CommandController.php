@@ -75,21 +75,17 @@ class CommandController extends AbstractController
     #[Route('/delete/{id}', name: 'app_delete_command_id',  requirements: ['id' => '\d+'], methods: ['DELETE'])]
     public function deleteCommand(Command $command, EntityManagerInterface $em): JsonResponse
     {
-        $em->remove($command); // Régler l'erreur qui survient lorsque des utilisateurs possèdent la commande en question
+        $em->remove($command);
         $em->flush();
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
     #[Route('/{id}', name: 'app_command_id', methods: ['GET'])]
-    public function getCommandDetail(int $id, SerializerInterface $serializer, CommandRepository $commandRepository): JsonResponse
+    public function getCommandDetail(Command $command, SerializerInterface $serializer
+        , CommandRepository $commandRepository): JsonResponse
     {
-
-        $command = $commandRepository->find($id);
-        if ($command) {
-            $jsonCommand = $serializer->serialize($command, 'json', ['groups' => 'getCommands']);
-            return new JsonResponse($jsonCommand, Response::HTTP_OK, [], true);
-        }
-        return new JsonResponse(null, Response::HTTP_NOT_FOUND);
+        $jsonCommand = $serializer->serialize($command, 'json', ['groups' => 'getCommands']);
+        return new JsonResponse($jsonCommand, Response::HTTP_OK, [], true);
     }
 }
