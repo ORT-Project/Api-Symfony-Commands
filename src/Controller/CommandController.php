@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[Route('/api/commands')]
 class CommandController extends AbstractController
 {
-    #[Route('/', name: 'app_command')]
+    #[Route('/', name: 'app_command', methods: ['GET'])]
     public function index(CommandRepository $commandRepository, SerializerInterface $serializer): JsonResponse
     {
         $commands = $commandRepository->findAll();
@@ -27,7 +27,7 @@ class CommandController extends AbstractController
         return new JsonResponse($jsonCommandList, Response::HTTP_OK, [], true);
     }
 
-    #[Route('/create', name: 'app_create_command')]
+    #[Route('/create', name: 'app_create_command', methods: ['POST'])]
     public function createCommand(Request $request, SerializerInterface $serializer, EntityManagerInterface $em,
                                UrlGeneratorInterface $urlGenerator, UserRepository $userRepository): JsonResponse
     {
